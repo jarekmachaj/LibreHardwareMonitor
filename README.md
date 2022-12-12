@@ -20,7 +20,13 @@ After making ugly => ok I will create PR to origin project.
 A place with many different dashboards created by community.
 
 
-## Custom web templates
-/bin/[ver]/templates/[template_name]
-[http://localhost:8085/template/jarek](http://localhost:8085/template/jarek)
+## Usage
+[b]Your dashboard start page must be index.html[/b]
+1. Copy web page to:
+`\bin\[ver]\templates\[template_name]` i.e. `\bin\Debug\net472\templates\myCustomTemplate`
+2. Start Hardware Monitor
+3. Navigate to `http://localhost:8085/template/[template_name]` i.e. [http://localhost:8085/template/myCustomTemplate]([http://localhost:8085/template/myCustomTemplate])
+
+Preview
+
 ![temps HM](https://user-images.githubusercontent.com/179938/207020005-473bc526-d060-4e30-ac90-f53aad890eda.gif)

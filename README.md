@@ -3,7 +3,7 @@
 ![temps HM](https://user-images.githubusercontent.com/179938/207020005-473bc526-d060-4e30-ac90-f53aad890eda.gif)
 
 # Custom web templates
-First of all, [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) is an awesome project, and thanks for all the work you have put in it!.
+First of all, [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) is an awesome project, and thanks for all the work you have put in it!
 
 I really missed free app that would allow me to display simple HTML dashboard with live refresh using any json data source. I've realized that a tool that I use daily exposes json data file with live sensor data.
 
@@ -16,6 +16,8 @@ My idea is to allow [LibreHardwareMonitor](https://github.com/LibreHardwareMonit
 
 ## Implementation
 I've just changed in an ugly way how `HttpServer` executes `Process(HttpListenerContext context)` method, now it allows to load files from hard drive and serve to the user using http. Any custom html can be loaded.
+
+I've also added `Type` to JSON nodes, for better identification in JS `jsonNode["Type"] = typeNode.SensorType.ToString();`
 
 After making ugly => ok I will create PR to origin project.
 

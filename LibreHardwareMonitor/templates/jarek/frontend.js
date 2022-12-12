@@ -1,25 +1,16 @@
 const url = window.location.origin;
 console.log(url);
-// let socket = io();
-// let socket = io.connect(url);
-// console.log(socket);
-var datap = document.querySelector("#data");
 var dataNumber = 0;
 var packageNumber = 0;
+let dataTemp = [];
 
 setInterval(async function () {
-  let obj = await (await fetch("http://localhost:8085/data.json")).json()
-  let data = obj.Children[0].Children.find(x => x.id == 42).Children.find(x => x.id == 67).Children.find(x => x.id == 86).Value;
-  let package = obj.Children[0].Children.find(x => x.id == 42).Children.find(x => x.id == 67).Children.find(x => x.id == 76).Value;
-  data = data.slice(0, -2);
-  package = package.slice(0, -2);
-  console.log(data);
-  datap.textContent = data;
-  dataNumber = Number(data);
-  packageNumber = Number(package);
+  let obj = await (await fetch("/data.json")).json()
+  let cpu = obj.Children[0].Children.find(x => x.Type == "Cpu");
+  console.log("cpu", cpu);
+  let temps = cpu.Children.find(x => x.Type == "Temperature").Children;
+  dataTemp = temps.filter(x => x.Type == "Temperature");
 }, 1000);
-
-// socket.on("mqtt", );
 
 //chart
 var chartColors = {
@@ -32,24 +23,37 @@ var chartColors = {
   grey: "rgb(201, 203, 207)"
 };
 
-function onRefresh(chart) {
-  chart.config.data.datasets.forEach(function (dataset) {
-    let data = {};
-    if (dataset.id == "general") {
-      data = {
-        x: Date.now(),
-        y: dataNumber
-      }
-    }    
+var chartColorsArr = [
+  "rgb(255, 99, 132)",
+  "rgb(255, 159, 64)",
+  "rgb(255, 205, 86)",
+  "rgb(75, 192, 192)",
+  "rgb(54, 162, 235)",
+  "rgb(153, 102, 255)",
+  "rgb(201, 203, 207)"
+]
 
-    if (dataset.id == "package") {
-      data = {
-        x: Date.now(),
-        y: packageNumber
+function onRefresh(chart) {
+  dataTemp.forEach(function (tempNode){
+    let dataset = chart.config.data.datasets.find(x => x.id == tempNode.id);
+    console.log("tempNode.text", tempNode);
+    if (!dataset) {
+      dataset = {
+        id: tempNode.id,
+        label: tempNode.Text,
+        // backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
+        borderColor: chartColorsArr[Math.floor(Math.random()*chartColorsArr.length)],
+        fill: false,
+        // lineTension: 0,
+        // borderDash: [8, 4],
+        data: []
       }
+      chart.config.data.datasets.push(dataset);
     }
-    
-    dataset.data.push(data);
+    dataset.data.push({
+      x: Date.now(),
+      y: tempNode.Value.slice(0, -2)
+    });
   });
 }
 
@@ -58,32 +62,24 @@ var config = {
   type: "line",
   data: {
     datasets: [
-      {
-        id: "general",
-        label: "core",
-        backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
-        borderColor: chartColors.blue,
-        fill: false,
-        lineTension: 0,
-        borderDash: [8, 4],
-        data: []
-      },
-      {
-        id: "package",
-        label: "package",
-        backgroundColor: color(chartColors.orange).alpha(0.5).rgbString(),
-        borderColor: chartColors.orange,
-        fill: false,
-        lineTension: 0,
-        borderDash: [8, 4],
-        data: []
-      }
+      
     ]
   },
   options: {
+    plugins: {
+      legend: {
+          display: false,
+          labels: {
+              color: 'rgb(255, 99, 132)'
+          }
+      }
+  },
+  legend: {
+    display: false
+},
     title: {
-      display: false,
-      text: "tytul legendae"
+      display: true,
+      text: "CPU temps"
     },
     scales: {
       xAxes: [
@@ -94,6 +90,10 @@ var config = {
             refresh: 1000,
             delay: 100,
             onRefresh: onRefresh
+          },
+          scaleLabel: {
+            display: true,
+            labelString: "Time"
           }
         }
       ],
@@ -104,8 +104,8 @@ var config = {
             min: 0
           },
           scaleLabel: {
-            display: false,
-            labelString: "value"
+            display: true,
+            labelString: "Temperature"
           }
         }
       ]
@@ -120,5 +120,5 @@ var config = {
     }
   }
 };
-var ctx = document.getElementById("myChart").getContext("2d");
+var ctx = document.getElementById("tempChart").getContext("2d");
 var chart = new Chart(ctx, config);

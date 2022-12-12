@@ -1,3 +1,7 @@
+# Preview
+
+![temps HM](https://user-images.githubusercontent.com/179938/207020005-473bc526-d060-4e30-ac90-f53aad890eda.gif)
+
 # Custom web templates
 First of all, [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) is an awesome project, and thanks for all the work you have put in it!.
 
@@ -26,7 +30,3 @@ A place with many different dashboards created by community.
 `\bin\[ver]\templates\[template_name]` i.e. `\bin\Debug\net472\templates\myCustomTemplate`
 2. Start Hardware Monitor
 3. Navigate to `http://localhost:8085/template/[template_name]` i.e. [http://localhost:8085/template/myCustomTemplate]([http://localhost:8085/template/myCustomTemplate])
-
-# Preview
-
-![temps HM](https://user-images.githubusercontent.com/179938/207020005-473bc526-d060-4e30-ac90-f53aad890eda.gif)

@@ -89,6 +89,9 @@ public void Monitor()
     computer.Close();
 }
 ```
+## Custom web templates
+/bin/[ver]/templates/[template_name]
+[http://localhost](http://localhost:8085/template/jarek)
 
 ## License
 LibreHardwareMonitor is free and open source software licensed under MPL 2.0. You can use it in private and commercial projects. Keep in mind that you must include a copy of the license in your project.

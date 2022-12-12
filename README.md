@@ -1,7 +1,7 @@
 # Custom web templates
 
 Inspirations:
-[https://forums.aida64.com/topic/2636-remotesensor-lcd-for-smartphones-and-tablets/] Aida64 remote LCD display 
+* [Aida64 remote LCD display](https://forums.aida64.com/topic/2636-remotesensor-lcd-for-smartphones-and-tablets/)
 
 Project started as a new feature for 
 

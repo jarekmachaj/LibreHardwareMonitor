@@ -30,6 +30,82 @@ public class HttpServer
     private readonly HttpListener _listener;
     private readonly Node _root;
     private Thread _listenerThread;
+    private readonly string _defaultDocumentName = "index.html";
+
+    /// <summary>
+    /// Mime Type conversion table
+    /// </summary>
+    private static IDictionary<string, string> _mimeTypeMappings =
+        new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+        {
+                #region extension to MIME type list
+                {".asf", "video/x-ms-asf"},
+                {".asx", "video/x-ms-asf"},
+                {".avi", "video/x-msvideo"},
+                {".bin", "application/octet-stream"},
+                {".cco", "application/x-cocoa"},
+                {".crt", "application/x-x509-ca-cert"},
+                {".css", "text/css"},
+                {".deb", "application/octet-stream"},
+                {".der", "application/x-x509-ca-cert"},
+                {".dll", "application/octet-stream"},
+                {".dmg", "application/octet-stream"},
+                {".ear", "application/java-archive"},
+                {".eot", "application/octet-stream"},
+                {".exe", "application/octet-stream"},
+                {".flv", "video/x-flv"},
+                {".gif", "image/gif"},
+                {".hqx", "application/mac-binhex40"},
+                {".htc", "text/x-component"},
+                {".htm", "text/html"},
+                {".html", "text/html"},
+                {".ico", "image/x-icon"},
+                {".img", "application/octet-stream"},
+                {".iso", "application/octet-stream"},
+                {".jar", "application/java-archive"},
+                {".jardiff", "application/x-java-archive-diff"},
+                {".jng", "image/x-jng"},
+                {".jnlp", "application/x-java-jnlp-file"},
+                {".jpeg", "image/jpeg"},
+                {".jpg", "image/jpeg"},
+                {".js", "application/x-javascript"},
+                {".mml", "text/mathml"},
+                {".mng", "video/x-mng"},
+                {".mov", "video/quicktime"},
+                {".mp3", "audio/mpeg"},
+                {".mpeg", "video/mpeg"},
+                {".mpg", "video/mpeg"},
+                {".msi", "application/octet-stream"},
+                {".msm", "application/octet-stream"},
+                {".msp", "application/octet-stream"},
+                {".pdb", "application/x-pilot"},
+                {".pdf", "application/pdf"},
+                {".pem", "application/x-x509-ca-cert"},
+                {".pl", "application/x-perl"},
+                {".pm", "application/x-perl"},
+                {".png", "image/png"},
+                {".prc", "application/x-pilot"},
+                {".ra", "audio/x-realaudio"},
+                {".rar", "application/x-rar-compressed"},
+                {".rpm", "application/x-redhat-package-manager"},
+                {".rss", "text/xml"},
+                {".run", "application/x-makeself"},
+                {".sea", "application/x-sea"},
+                {".shtml", "text/html"},
+                {".sit", "application/x-stuffit"},
+                {".swf", "application/x-shockwave-flash"},
+                {".tcl", "application/x-tcl"},
+                {".tk", "application/x-tcl"},
+                {".txt", "text/plain"},
+                {".war", "application/java-archive"},
+                {".wbmp", "image/vnd.wap.wbmp"},
+                {".wmv", "video/x-ms-wmv"},
+                {".xml", "text/xml"},
+                {".xpi", "application/x-xpinstall"},
+                {".zip", "application/zip"},
+
+            #endregion
+        };
 
     public HttpServer(Node node, int port, bool authEnabled = false, string userName = "", string password = "")
     {
@@ -38,7 +114,6 @@ public class HttpServer
         AuthEnabled = authEnabled;
         UserName = userName;
         Password = password;
-
         try
         {
             _listener = new HttpListener { IgnoreWriteExceptions = true };
@@ -283,6 +358,78 @@ public class HttpServer
 #endif
     }
 
+    private void Process(HttpListenerContext context)
+    {
+        string filename = context.Request.Url.ToString();
+        string templateName = "";
+        string filePath = "";
+        var parts = filename.Split('/');
+        if (string.Equals(parts[parts.Length - 2], "template", StringComparison.OrdinalIgnoreCase))
+        {
+            templateName = parts[parts.Length - 1];
+            if (string.IsNullOrEmpty(templateName))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                context.Response.OutputStream.Close();
+                return;
+            }
+            filePath = Path.Combine(Directory.GetCurrentDirectory(), "templates", templateName, _defaultDocumentName);
+        }
+        else if (string.Equals(parts[parts.Length - 3], "template", StringComparison.OrdinalIgnoreCase))
+        {
+            templateName = parts[parts.Length - 2];
+            if (string.IsNullOrEmpty(templateName))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                context.Response.OutputStream.Close();
+                return;
+            }
+            filePath = Path.Combine(Directory.GetCurrentDirectory(), "templates", templateName, parts[parts.Length - 1]);
+        }
+        else
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            context.Response.OutputStream.Close();
+            return;
+        }
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                Stream input = new FileStream(filePath, FileMode.Open);
+
+                //Adding permanent http response headers
+                string mime;
+                context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(filePath), out mime)
+                    ? mime
+                    : "application/octet-stream";
+                context.Response.ContentLength64 = input.Length;
+                context.Response.AddHeader("Date", DateTime.Now.ToString("r"));
+                context.Response.AddHeader("Last-Modified", File.GetLastWriteTime(filePath).ToString("r"));
+
+                byte[] buffer = new byte[1024 * 32];
+                int nbytes;
+                while ((nbytes = input.Read(buffer, 0, buffer.Length)) > 0)
+                    context.Response.OutputStream.Write(buffer, 0, nbytes);
+                input.Close();
+                context.Response.OutputStream.Flush();
+
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+
+        }
+        else
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+        }
+
+        context.Response.OutputStream.Close();
+    }
+
     private void ListenerCallback(IAsyncResult result)
     {
         HttpListener listener = (HttpListener)result.AsyncState;
@@ -324,57 +471,66 @@ public class HttpServer
 
         if (authenticated)
         {
-            switch (request.HttpMethod)
+            string filename = context.Request.Url.ToString();
+            if (filename.Contains("/template/"))
             {
-                case "POST":
-                    {
-                        string postResult = HandlePostRequest(request);
+                Process(context);
+            }                
+            else
+            { 
 
-                        Stream output = context.Response.OutputStream;
-                        byte[] utfBytes = Encoding.UTF8.GetBytes(postResult);
-
-                        context.Response.AddHeader("Cache-Control", "no-cache");
-                        context.Response.ContentLength64 = utfBytes.Length;
-                        context.Response.ContentType = "application/json";
-
-                        output.Write(utfBytes, 0, utfBytes.Length);
-                        output.Close();
-
-                        break;
-                    }
-                case "GET":
-                    {
-                        string requestedFile = request.RawUrl.Substring(1);
-
-                        if (requestedFile == "data.json")
+                switch (request.HttpMethod)
+                {
+                    case "POST":
                         {
-                            SendJson(context.Response, request);
-                            return;
-                        }
+                            string postResult = HandlePostRequest(request);
 
-                        if (requestedFile.Contains("images_icon"))
+                            Stream output = context.Response.OutputStream;
+                            byte[] utfBytes = Encoding.UTF8.GetBytes(postResult);
+
+                            context.Response.AddHeader("Cache-Control", "no-cache");
+                            context.Response.ContentLength64 = utfBytes.Length;
+                            context.Response.ContentType = "application/json";
+
+                            output.Write(utfBytes, 0, utfBytes.Length);
+                            output.Close();
+
+                            break;
+                        }
+                    case "GET":
                         {
-                            ServeResourceImage(context.Response,
-                                               requestedFile.Replace("images_icon/", string.Empty));
+                            string requestedFile = request.RawUrl.Substring(1);
 
-                            return;
+                            if (requestedFile == "data.json")
+                            {
+                                SendJson(context.Response, request);
+                                return;
+                            }
+
+                            if (requestedFile.Contains("images_icon"))
+                            {
+                                ServeResourceImage(context.Response,
+                                                   requestedFile.Replace("images_icon/", string.Empty));
+
+                                return;
+                            }
+
+                            // default file to be served
+                            if (string.IsNullOrEmpty(requestedFile))
+                                requestedFile = "index.html";
+
+                            string[] splits = requestedFile.Split('.');
+                            string ext = splits[splits.Length - 1];
+                            ServeResourceFile(context.Response, "Web." + requestedFile.Replace('/', '.'), ext);
+
+                            break;
                         }
-
-                        // default file to be served
-                        if (string.IsNullOrEmpty(requestedFile))
-                            requestedFile = "index.html";
-
-                        string[] splits = requestedFile.Split('.');
-                        string ext = splits[splits.Length - 1];
-                        ServeResourceFile(context.Response, "Web." + requestedFile.Replace('/', '.'), ext);
-
-                        break;
-                    }
-                default:
-                    {
-                        context.Response.StatusCode = 404;
-                        break;
-                    }
+                    default:
+                        {
+                            context.Response.StatusCode = 404;
+                            break;
+                        }
+                }
             }
         }
         else

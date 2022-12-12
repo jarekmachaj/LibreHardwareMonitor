@@ -74,4 +74,15 @@
     <None Include="Resources\app.manifest" />
     <None Include="Resources\icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="templates\jarek\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="templates\jarek\frontend.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="templates\jarek\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

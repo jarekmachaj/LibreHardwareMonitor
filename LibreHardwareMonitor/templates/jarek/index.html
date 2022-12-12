@@ -1,24 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jarek</title>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
-      integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+            integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+            crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@1.8.0/dist/chartjs-plugin-streaming.min.js"></script>
-  </head>
-  <body>
-    <h1>Jarek's template</h1>
-    <div style="width: 400px;">
-    <canvas id="tempChart" width="1000px" height="720px"></canvas>
-    <canvas id="tempChart2" width="700px" height="720px"></canvas>
-  </div>
+    <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://getbootstrap.com/docs/4.0/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <main role="main">
+        <h1>Jarek's template</h1>
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <canvas id="cpuTempChart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <canvas id="cpuLoadChart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <canvas id="gpuLoadChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
     <script src="jarek/frontend.js"></script>
-  </body>
+</body>
 </html>

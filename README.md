@@ -1,3 +1,14 @@
+# Custom web templates
+
+Remote monitoring is very important, there are many different projects that allow to monitor PC using dashboards displayed in a web browser.
+
+Inspirations:
+[https://forums.aida64.com/topic/2636-remotesensor-lcd-for-smartphones-and-tablets/] Aida64 remote LCD display 
+
+Project started as a new feature for 
+
+Simple overview of use/purpose.
+
 ## Custom web templates
 /bin/[ver]/templates/[template_name]
 [http://localhost:8085/template/jarek](http://localhost:8085/template/jarek)

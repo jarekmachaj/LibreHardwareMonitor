@@ -5,14 +5,18 @@ console.log(url);
 // console.log(socket);
 var datap = document.querySelector("#data");
 var dataNumber = 0;
+var packageNumber = 0;
 
 setInterval(async function () {
   let obj = await (await fetch("http://localhost:8085/data.json")).json()
   let data = obj.Children[0].Children.find(x => x.id == 42).Children.find(x => x.id == 67).Children.find(x => x.id == 86).Value;
+  let package = obj.Children[0].Children.find(x => x.id == 42).Children.find(x => x.id == 67).Children.find(x => x.id == 76).Value;
   data = data.slice(0, -2);
+  package = package.slice(0, -2);
   console.log(data);
   datap.textContent = data;
   dataNumber = Number(data);
+  packageNumber = Number(package);
 }, 1000);
 
 // socket.on("mqtt", );
@@ -30,10 +34,22 @@ var chartColors = {
 
 function onRefresh(chart) {
   chart.config.data.datasets.forEach(function (dataset) {
-    dataset.data.push({
-      x: Date.now(),
-      y: dataNumber
-    });
+    let data = {};
+    if (dataset.id == "general") {
+      data = {
+        x: Date.now(),
+        y: dataNumber
+      }
+    }    
+
+    if (dataset.id == "package") {
+      data = {
+        x: Date.now(),
+        y: packageNumber
+      }
+    }
+    
+    dataset.data.push(data);
   });
 }
 
@@ -43,9 +59,20 @@ var config = {
   data: {
     datasets: [
       {
-        label: "cpu temp",
+        id: "general",
+        label: "core",
         backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
         borderColor: chartColors.blue,
+        fill: false,
+        lineTension: 0,
+        borderDash: [8, 4],
+        data: []
+      },
+      {
+        id: "package",
+        label: "package",
+        backgroundColor: color(chartColors.orange).alpha(0.5).rgbString(),
+        borderColor: chartColors.orange,
         fill: false,
         lineTension: 0,
         borderDash: [8, 4],

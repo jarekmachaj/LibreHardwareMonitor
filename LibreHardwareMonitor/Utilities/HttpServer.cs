@@ -157,8 +157,6 @@ public class HttpServer
     {
         if (PlatformNotSupported)
             return false;
-
-
         try
         {
             if (_listener.IsListening)
@@ -190,7 +188,6 @@ public class HttpServer
     {
         if (PlatformNotSupported)
             return false;
-
 
         try
         {
@@ -710,6 +707,7 @@ public class HttpServer
 
     private JObject GenerateJsonForNode(Node n, ref int nodeIndex)
     {
+        //TODO: tutaj api
         JObject jsonNode = new JObject
         {
             ["id"] = nodeIndex++,
@@ -731,13 +729,16 @@ public class HttpServer
         else if (n is HardwareNode hardwareNode)
         {
             jsonNode["ImageURL"] = "images_icon/" + GetHardwareImageFile(hardwareNode);
+            jsonNode["Type"] = hardwareNode.Hardware.HardwareType.ToString();
         }
         else if (n is TypeNode typeNode)
         {
             jsonNode["ImageURL"] = "images_icon/" + GetTypeImageFile(typeNode);
+            jsonNode["Type"] = typeNode.SensorType.ToString();
         }
         else
         {
+            jsonNode["Type"] = "Computer";
             jsonNode["ImageURL"] = "images_icon/computer.png";
         }
 

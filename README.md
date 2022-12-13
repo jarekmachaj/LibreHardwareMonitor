@@ -9,6 +9,7 @@ I really missed free app that would allow me to display simple HTML dashboard wi
 
 Inspirations:
 * [Aida64 remote LCD display](https://forums.aida64.com/topic/2636-remotesensor-lcd-for-smartphones-and-tablets/)
+* Well known [Glances](https://github.com/nicolargo/glances)
 
 ## Description
 

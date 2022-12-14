@@ -105,8 +105,8 @@ var config = {
             display: false
         },
         title: {
-            display: true,
-            text: "CPU tempsss"
+            display: false,
+            text: "CPU temp"
         },
         scales: {
             xAxes: [
@@ -127,7 +127,7 @@ var config = {
                         }
                     },
                     scaleLabel: {
-                        display: true,
+                        display: false,
                         labelString: "Time"
                     }
                 }
@@ -135,11 +135,11 @@ var config = {
             yAxes: [
                 {
                     ticks: {
-                        max: 120,
-                        min: 0
+                        max: 105,
+                        min: 20
                     },
                     scaleLabel: {
-                        display: true,
+                        display: false,
                         labelString: "Temperature"
                     }
                 }
@@ -157,10 +157,19 @@ var config = {
 };
 
 var cpuLoadconfig = {
+    options: {
+        title: {
+            display: false,
+            text: "CPU Load"
+        },
+        legend: {
+            display: false
+        }
+    },
     type: 'doughnut',
     data: [],
     data: {
-        labels: ['Free', 'Load'],
+        // labels: ['Free', 'Load'],
         datasets: [{
             data: [],
             backgroundColor: [
@@ -177,6 +186,15 @@ var cpuLoadconfig = {
 };
 
 var gpuLoadconfig = {
+    options: {
+        title: {
+            display: false,
+            text: "GPU Load"
+        },
+        legend: {
+            display: false
+        },
+    },
     type: 'doughnut',
     data: [],
     data: {
@@ -202,3 +220,37 @@ var gpuLoadCtx = document.getElementById("gpuLoadChart").getContext("2d");
 var cpuTempChart = new Chart(cpuTempCtx, config);
 var cpuLoadChart = new Chart(cpuLoadCtx, cpuLoadconfig);
 var gpuLoadChart = new Chart(gpuLoadCtx, gpuLoadconfig);
+
+
+$(function () {
+    $('.chart').easyPieChart({
+        size: 160,
+        barColor: "#17d3e6",
+        scaleLength: 0,
+        lineWidth: 15,
+        trackColor: "#373737",
+        lineCap: "circle",
+        animate: 1000,
+        onStep: function (value) {
+            //this.$el.find('span').text(~~value);
+        }
+    });
+});
+
+setInterval(function () {
+    const val = Math.floor(Math.random() * 101);
+    $(".chart").each(function () {
+        $(this).data('easyPieChart').update(val);
+        $(this).find('span').text(val + "%")
+    });
+
+    $(".progress").each(function () {
+        $(this).progressbar({
+            value: Math.floor(Math.random() * 101)
+        });
+    });
+}, 1000);
+
+
+
+
